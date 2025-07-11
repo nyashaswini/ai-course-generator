@@ -1,18 +1,6 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { clerkMiddleware } from '@clerk/nextjs/server'
 
-const isProtectedRoute = createRouteMatcher(
-    ['/dashboard(.*)','/create-course']
-)
-
-export default clerkMiddleware((auth, req) => {
-  if (isProtectedRoute(req)) {
-    // Only protect if it's not an API route
-    if (!req.url.startsWith('/api')) {
-      return auth().protect()
-    }
-  }
-  return null
-})
+export default clerkMiddleware()
 export const config = {
   matcher: [
     // Skip Next.js internals and all static files
