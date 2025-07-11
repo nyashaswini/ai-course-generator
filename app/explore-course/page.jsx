@@ -1,9 +1,6 @@
 "use client"
-import { db } from '@/configs/db'
-import { CourseList } from '@/configs/Schema'
 import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { index } from 'drizzle-orm/mysql-core'
 import Card from './_components/Card'
 import Header from '../_components/Header'
 
@@ -13,24 +10,26 @@ const ExploreCourse = () => {
   const[pageIndex,setPageIndex]=useState(0);
 
   useEffect(()=>{
-       GetAllCourse();
-       const timer = setTimeout(() => {
-        setShowSkeleton(false); // Hide skeleton after 10 seconds
-      }, 3000);
-  
-      // Cleanup the timer on component unmount
-      return () => clearTimeout(timer);
-  
-       
+    fetchCourses();
+    const timer = setTimeout(() => {
+      setShowSkeleton(false); // Hide skeleton after 10 seconds
+    }, 3000);
+
+    return () => clearTimeout(timer);
   },[pageIndex])
 
-  const GetAllCourse = async()=>{
-    const result =  await db.select().from(CourseList).limit(6).offset(pageIndex*6);
-
-    // console.log(result);
-    setCourseList(result.slice(0,6));
-    setShowSkeleton(false);
+  const fetchCourses = async () => {
+    try {
+      const response = await fetch(`/api/courses?page=${pageIndex}&limit=6`);
+      const data = await response.json();
+      if (data.courses) {
+        setCourseList(data.courses)
+      }
+    } catch (error) {
+      console.error('Error fetching courses:', error)
+    }
   }
+
   return (
     <>
     <Header/>
